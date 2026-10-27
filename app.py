@@ -428,3 +428,47 @@ elif operation == "✏️ Update File":
         elif update_type == "Append Content":
 
             new_content = st.text
+
+       ```python
+# --------------------------------------------------
+# DELETE FILE
+# --------------------------------------------------
+
+elif operation == "🗑️ Delete File":
+
+    st.header("🗑️ Delete a File")
+
+    files = get_files()
+
+    if not files:
+        st.info("No files found. Please create a file first.")
+
+    else:
+        filename = st.selectbox(
+            "Select a file to delete",
+            files,
+            key="delete_filename"
+        )
+
+        confirm_delete = st.checkbox(
+            f"I confirm that I want to delete '{filename}'",
+            key="confirm_delete"
+        )
+
+        if st.button(
+            "🗑️ Delete File",
+            use_container_width=True
+        ):
+            if not confirm_delete:
+                st.warning("Please confirm before deleting the file.")
+            else:
+                try:
+                    path = get_file(filename)
+                    path.unlink()
+
+                    st.success(f"File '{filename}' deleted successfully!")
+                    st.rerun()
+
+                except (OSError, ValueError) as error:
+                    st.error(f"Unable to delete file: {error}")
+```
