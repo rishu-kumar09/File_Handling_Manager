@@ -429,7 +429,7 @@ elif operation == "✏️ Update File":
 
             new_content = st.text
 
-       ```python
+       
 # --------------------------------------------------
 # DELETE FILE
 # --------------------------------------------------
@@ -471,4 +471,3 @@ elif operation == "🗑️ Delete File":
 
                 except (OSError, ValueError) as error:
                     st.error(f"Unable to delete file: {error}")
-```
