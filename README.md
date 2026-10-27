@@ -18,7 +18,7 @@ This is a simple File Handling project created using Python. I made this project
 
 ## 📸 Preview
 
-![image alt](https://github.com/rishu-kumar09/File_Handling_Manager/blob/bb5c68a42af02678cc82326af5437720aa32fc8b/screenshot.png)
+![image alt](https://github.com/rishu-kumar09/File_Handling_Manager/blob/26beec1ac7c7e7a5b6928307cafdbfa7460a7625/screenshot.png2.png)
 
 
 
