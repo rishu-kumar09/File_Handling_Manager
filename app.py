@@ -15,92 +15,152 @@ st.set_page_config(
 # --------------------------------------------------
 # CUSTOM CSS
 # --------------------------------------------------
-
+```python
 st.markdown("""
 <style>
+
+/* Main Background */
 .stApp {
-    background-color: #0e1117;
-    color: #f5f5f5;
+    background: linear-gradient(135deg, #0f1020, #17152b, #101827);
+    color: #ffffff;
 }
 
+/* Sidebar */
 [data-testid="stSidebar"] {
-    background-color: #262730;
+    background: linear-gradient(180deg, #292442, #191827);
+    border-right: 1px solid #7048a8;
 }
 
-[data-testid="stSidebar"] h1 {
-    color: white;
+[data-testid="stSidebar"] h1,
+[data-testid="stSidebar"] h2,
+[data-testid="stSidebar"] h3 {
+    color: #d8b4fe !important;
 }
 
+[data-testid="stSidebar"] p,
+[data-testid="stSidebar"] label {
+    color: #ffffff !important;
+}
+
+/* Gradient Header */
 .hero {
-    background: linear-gradient(
-        120deg,
-        #4f46e5,
-        #7c3aed,
-        #db2777
-    );
+    background: linear-gradient(120deg, #4f46e5, #9333ea, #db2777);
     padding: 35px;
     border-radius: 20px;
     color: white;
-    margin-bottom: 25px;
-    box-shadow: 0 10px 30px rgba(124, 58, 237, 0.2);
+    margin-bottom: 30px;
+    box-shadow: 0 8px 30px rgba(168, 85, 247, 0.35);
 }
 
 .hero h1 {
-    color: white;
-    font-size: 2.4rem;
-    margin-bottom: 12px;
+    color: white !important;
+    font-size: 2.5rem;
+    font-weight: 800;
 }
 
 .hero p {
-    color: white;
+    color: white !important;
     font-size: 1.1rem;
 }
 
+/* Dashboard Cards */
 div[data-testid="stMetric"] {
-    background-color: #1b1c23;
-    border: 1px solid #393a45;
+    background: linear-gradient(135deg, #302650, #1b1c2b);
+    border: 1px solid #8b5cf6;
+    border-radius: 16px;
     padding: 22px;
-    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(139, 92, 246, 0.15);
 }
 
-div[data-testid="stMetricLabel"],
+div[data-testid="stMetricLabel"] {
+    color: #c4b5fd !important;
+}
+
 div[data-testid="stMetricValue"] {
-    color: white;
+    color: #ffffff !important;
 }
 
-.stButton > button {
-    background: linear-gradient(90deg, #6366f1, #db2777);
-    color: white;
-    border: none;
-    border-radius: 9px;
-    padding: 10px 20px;
-    font-weight: bold;
-    transition: 0.2s;
+/* Headings */
+h1, h2, h3 {
+    color: #f5f3ff;
 }
 
-.stButton > button:hover {
-    border: 1px solid #ffffff;
-    color: white;
-    filter: brightness(1.15);
-}
-
+/* Input Fields */
 .stTextInput input,
 .stTextArea textarea {
-    background-color: #262730;
+    background-color: #25243a !important;
+    color: #ffffff !important;
+    border: 1px solid #7c3aed !important;
+    border-radius: 10px !important;
+}
+
+/* Dropdowns */
+.stSelectbox [data-baseweb="select"] > div {
+    background-color: #25243a;
+    border-color: #7c3aed;
     color: white;
-    border-radius: 8px;
 }
 
-h1, h2, h3 {
-    color: #f5f5f5;
+/* Colourful Buttons */
+.stButton > button,
+.stFormSubmitButton > button {
+    background: linear-gradient(90deg, #6366f1, #9333ea, #db2777) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 10px !important;
+    font-weight: bold !important;
+    padding: 10px 20px !important;
+    transition: 0.3s ease;
 }
 
+/* Button Hover */
+.stButton > button:hover,
+.stFormSubmitButton > button:hover {
+    filter: brightness(1.2);
+    box-shadow: 0 5px 20px rgba(219, 39, 119, 0.35);
+    border: 1px solid white !important;
+}
+
+/* Forms */
+[data-testid="stForm"] {
+    background: rgba(40, 32, 65, 0.55);
+    border: 1px solid #7048a8;
+    border-radius: 15px;
+    padding: 20px;
+}
+
+/* Radio Buttons */
+.stRadio label {
+    color: #e9d5ff !important;
+}
+
+/* Dividers */
 hr {
-    border-color: #393a45;
+    border-color: #51416f !important;
+}
+
+/* Success Messages */
+[data-testid="stAlert"][kind="success"] {
+    border: 1px solid #10b981;
+    border-radius: 10px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero {
+        padding: 22px;
+    }
+
+    .hero h1 {
+        font-size: 1.8rem;
+    }
 }
 
 </style>
 """, unsafe_allow_html=True)
+```
+
+
 
 # --------------------------------------------------
 # FILE STORAGE
