@@ -203,7 +203,18 @@ def get_files():
 # --------------------------------------------------
 # HEADER
 # --------------------------------------------------
-
+st.markdown("""
+<div style="
+    background: linear-gradient(90deg, #ff0000, #ff00ff, #0000ff);
+    color: white;
+    padding: 40px;
+    border-radius: 20px;
+    text-align: center;
+">
+    <h1 style="color: white;">📁 File Handling Manager</h1>
+    <p style="color: white;">Create • Read • Update • Delete Files</p>
+</div>
+""", unsafe_allow_html=True)
 st.markdown("""
 <div class="hero">
     <h1>📁 File Handling Manager</h1>
