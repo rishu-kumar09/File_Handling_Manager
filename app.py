@@ -1,181 +1,380 @@
-import streamlit as st
+```python
 from pathlib import Path
-from datetime import datetime
+import streamlit as st
 
-# ---------- Setup ----------
-BASE_DIR = Path("workspace")  # all files live here (safe sandbox)
-BASE_DIR.mkdir(exist_ok=True)
+# --------------------------------------------------
+# PAGE CONFIGURATION
+# --------------------------------------------------
 
-st.set_page_config(page_title="File Handling Manager", page_icon="📁", layout="wide")
-
-# ---------- Custom CSS ----------
-st.markdown(
-    """
-    <style>
-    .hero {
-        background: linear-gradient(120deg, #4f46e5, #7c3aed 55%, #db2777);
-        padding: 2rem 2.2rem; border-radius: 18px; color: white;
-        margin-bottom: 1.4rem; box-shadow: 0 10px 30px rgba(79,70,229,.30);
-    }
-    .hero h1 { margin: 0; font-size: 2.1rem; }
-    .hero p  { margin: .4rem 0 0; opacity: .9; }
-    .stat {
-        background: rgba(128,128,128,.10); border: 1px solid rgba(128,128,128,.25);
-        border-radius: 14px; padding: 1rem 1.2rem; text-align: center;
-    }
-    .stat h2 { margin: 0; font-size: 1.8rem; }
-    .stat span { opacity: .7; font-size: .85rem; }
-    div.stButton > button {
-        border-radius: 10px; font-weight: 600; padding: .5rem 1.4rem;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
+st.set_page_config(
+    page_title="File Handling Manager",
+    page_icon="📁",
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
+# --------------------------------------------------
+# CUSTOM CSS
+# --------------------------------------------------
 
-# ---------- Helpers ----------
-def get_path(name: str):
-    """Return a safe path inside workspace (blocks ../ tricks)."""
-    name = Path(name.strip()).name
-    return BASE_DIR / name if name else None
+st.markdown("""
+<style>
+.stApp {
+    background-color: #0e1117;
+    color: #f5f5f5;
+}
+
+[data-testid="stSidebar"] {
+    background-color: #262730;
+}
+
+[data-testid="stSidebar"] h1 {
+    color: white;
+}
+
+.hero {
+    background: linear-gradient(
+        120deg,
+        #4f46e5,
+        #7c3aed,
+        #db2777
+    );
+    padding: 35px;
+    border-radius: 20px;
+    color: white;
+    margin-bottom: 25px;
+    box-shadow: 0 10px 30px rgba(124, 58, 237, 0.2);
+}
+
+.hero h1 {
+    color: white;
+    font-size: 2.4rem;
+    margin-bottom: 12px;
+}
+
+.hero p {
+    color: white;
+    font-size: 1.1rem;
+}
+
+div[data-testid="stMetric"] {
+    background-color: #1b1c23;
+    border: 1px solid #393a45;
+    padding: 22px;
+    border-radius: 15px;
+}
+
+div[data-testid="stMetricLabel"],
+div[data-testid="stMetricValue"] {
+    color: white;
+}
+
+.stButton > button {
+    background: linear-gradient(90deg, #6366f1, #db2777);
+    color: white;
+    border: none;
+    border-radius: 9px;
+    padding: 10px 20px;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.stButton > button:hover {
+    border: 1px solid #ffffff;
+    color: white;
+    filter: brightness(1.15);
+}
+
+.stTextInput input,
+.stTextArea textarea {
+    background-color: #262730;
+    color: white;
+    border-radius: 8px;
+}
+
+h1, h2, h3 {
+    color: #f5f5f5;
+}
+
+hr {
+    border-color: #393a45;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+# --------------------------------------------------
+# FILE STORAGE
+# --------------------------------------------------
+
+DATA_DIR = Path("user_files")
+DATA_DIR.mkdir(exist_ok=True)
 
 
-def list_files():
-    return sorted(p for p in BASE_DIR.iterdir() if p.is_file())
+def get_file(filename):
+    """Return a validated path inside the storage directory."""
+
+    filename = filename.strip()
+
+    if not filename or filename in (".", ".."):
+        raise ValueError("Please enter a valid file name.")
+
+    if Path(filename).name != filename:
+        raise ValueError("Please enter a file name without folder paths.")
+
+    base = DATA_DIR.resolve()
+    path = (DATA_DIR / filename).resolve()
+
+    if path.parent != base:
+        raise ValueError("Invalid file path.")
+
+    return path
 
 
-def human_size(n: int) -> str:
-    return f"{n} B" if n < 1024 else f"{n / 1024:.1f} KB"
+def get_files():
+    """List files stored in the project directory."""
 
-
-# ---------- Header ----------
-st.markdown(
-    """
-    <div class="hero">
-        <h1>📁 File Handling Manager</h1>
-        <p>Create • Read • Update • Delete files — built with Python &amp; Streamlit</p>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
-
-files = list_files()
-total_size = sum(f.stat().st_size for f in files)
-
-c1, c2, c3 = st.columns(3)
-c1.markdown(f'<div class="stat"><h2>{len(files)}</h2><span>Total Files</span></div>', unsafe_allow_html=True)
-c2.markdown(f'<div class="stat"><h2>{human_size(total_size)}</h2><span>Storage Used</span></div>', unsafe_allow_html=True)
-c3.markdown(f'<div class="stat"><h2>{datetime.now():%H:%M}</h2><span>Current Time</span></div>', unsafe_allow_html=True)
-
-st.write("")
-
-# ---------- Sidebar ----------
-with st.sidebar:
-    st.title("⚙️ Operations")
-    choice = st.radio(
-        "Choose an action",
-        ["➕ Create File", "📖 Read File", "✏️ Update File", "🗑️ Delete File"],
-        label_visibility="collapsed",
+    return sorted(
+        file.name
+        for file in DATA_DIR.iterdir()
+        if file.is_file()
     )
-    st.divider()
-    st.caption("Made by Rishu Srivastava")
-    st.caption("Python • pathlib • Streamlit")
 
-# ---------- 1. CREATE ----------
-if choice == "➕ Create File":
-    st.subheader("➕ Create a New File")
-    name = st.text_input("File name", placeholder="notes.txt")
-    data = st.text_area("File content", height=200, placeholder="Write something...")
 
-    if st.button("Create File", type="primary"):
-        path = get_path(name)
-        if path is None:
-            st.warning("Please enter a file name.")
-        elif path.exists():
-            st.error(f"'{path.name}' already exists.")
-        else:
-            path.write_text(data, encoding="utf-8")
-            st.success(f"File '{path.name}' created successfully!")
-            st.balloons()
+# --------------------------------------------------
+# HEADER
+# --------------------------------------------------
 
-# ---------- 2. READ ----------
-elif choice == "📖 Read File":
-    st.subheader("📖 Read a File")
-    if not files:
-        st.info("No files yet. Create one first!")
+st.markdown("""
+<div class="hero">
+    <h1>📁 File Handling Manager</h1>
+    <p>Create • Read • Update • Delete files</p>
+    <p>Built with Python and Streamlit</p>
+</div>
+""", unsafe_allow_html=True)
+
+# --------------------------------------------------
+# DASHBOARD
+# --------------------------------------------------
+
+files = get_files()
+
+total_files = len(files)
+
+total_size = sum(
+    (DATA_DIR / filename).stat().st_size
+    for filename in files
+)
+
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    st.metric("📄 Total Files", total_files)
+
+with col2:
+    if total_size < 1024:
+        size_display = f"{total_size} B"
+    elif total_size < 1024 * 1024:
+        size_display = f"{total_size / 1024:.2f} KB"
     else:
-        selected = st.selectbox("Select a file", [f.name for f in files])
-        path = BASE_DIR / selected
-        content = path.read_text(encoding="utf-8")
-        st.text_area("Content", content, height=250, disabled=True)
-        st.download_button("⬇️ Download", content, file_name=selected)
+        size_display = f"{total_size / (1024 * 1024):.2f} MB"
 
-# ---------- 3. UPDATE ----------
-elif choice == "✏️ Update File":
-    st.subheader("✏️ Update a File")
-    if not files:
-        st.info("No files yet. Create one first!")
-    else:
-        selected = st.selectbox("Select a file", [f.name for f in files])
-        path = BASE_DIR / selected
-        mode = st.radio("What do you want to do?", ["Rename", "Append", "Overwrite"], horizontal=True)
+    st.metric("💾 Storage Used", size_display)
 
-        if mode == "Rename":
-            new_name = st.text_input("New file name")
-            if st.button("Rename", type="primary"):
-                new_path = get_path(new_name)
-                if new_path is None:
-                    st.warning("Enter a new name.")
-                elif new_path.exists():
-                    st.error("A file with that name already exists.")
-                else:
-                    path.rename(new_path)
-                    st.success(f"Renamed to '{new_path.name}'")
-                    st.rerun()
+with col3:
+    st.metric("⚙️ File Operations", 4)
 
-        elif mode == "Append":
-            extra = st.text_area("Text to append", height=150)
-            if st.button("Append", type="primary"):
-                with open(path, "a", encoding="utf-8") as fs:
-                    fs.write("\n" + extra)
-                st.success("Content appended successfully!")
-
-        else:  # Overwrite
-            new_data = st.text_area("New content (old content will be replaced)", height=150)
-            if st.button("Overwrite", type="primary"):
-                path.write_text(new_data, encoding="utf-8")
-                st.success("File overwritten successfully!")
-
-# ---------- 4. DELETE ----------
-else:
-    st.subheader("🗑️ Delete a File")
-    if not files:
-        st.info("Nothing to delete.")
-    else:
-        selected = st.selectbox("Select a file", [f.name for f in files])
-        sure = st.checkbox(f"Yes, I want to permanently delete '{selected}'")
-        if st.button("Delete File", type="primary", disabled=not sure):
-            (BASE_DIR / selected).unlink()
-            st.success(f"'{selected}' deleted successfully!")
-            st.rerun()
-
-# ---------- File Explorer ----------
 st.divider()
-st.subheader("🗂️ File Explorer")
-files = list_files()
-if files:
-    st.dataframe(
-        [
-            {
-                "File": f.name,
-                "Size": human_size(f.stat().st_size),
-                "Modified": datetime.fromtimestamp(f.stat().st_mtime).strftime("%d %b %Y, %H:%M"),
-            }
-            for f in files
-        ],
-        use_container_width=True,
-        hide_index=True,
-    )
-else:
-    st.caption("Workspace is empty.")
+
+# --------------------------------------------------
+# SIDEBAR
+# --------------------------------------------------
+
+st.sidebar.title("⚙️ Operations")
+
+operation = st.sidebar.radio(
+    "Choose an operation",
+    [
+        "➕ Create File",
+        "📖 Read File",
+        "✏️ Update File",
+        "🗑️ Delete File"
+    ]
+)
+
+st.sidebar.divider()
+
+st.sidebar.markdown("### 👨‍💻 About")
+st.sidebar.write("Made by Rishu Kumar")
+st.sidebar.caption("Python • pathlib • Streamlit")
+
+# --------------------------------------------------
+# CREATE FILE
+# --------------------------------------------------
+
+if operation == "➕ Create File":
+
+    st.header("➕ Create a New File")
+
+    with st.form("create_file_form"):
+
+        filename = st.text_input(
+            "File name",
+            placeholder="notes.txt"
+        )
+
+        content = st.text_area(
+            "File content",
+            placeholder="Write something..."
+        )
+
+        create_button = st.form_submit_button(
+            "➕ Create File",
+            use_container_width=True
+        )
+
+    if create_button:
+
+        try:
+            path = get_file(filename)
+
+            if path.exists():
+                st.error("A file with this name already exists.")
+
+            else:
+                with path.open("x", encoding="utf-8") as file:
+                    file.write(content)
+
+                st.success(
+                    f"File '{filename}' created successfully!"
+                )
+
+                st.rerun()
+
+        except (OSError, ValueError) as error:
+            st.error(f"Unable to create file: {error}")
+
+# --------------------------------------------------
+# READ FILE
+# --------------------------------------------------
+
+elif operation == "📖 Read File":
+
+    st.header("📖 Read a File")
+
+    files = get_files()
+
+    if not files:
+
+        st.info("No files found. Please create a file first.")
+
+    else:
+
+        filename = st.selectbox(
+            "Select a file",
+            files,
+            key="read_filename"
+        )
+
+        if st.button(
+            "📖 Read File",
+            use_container_width=True
+        ):
+
+            try:
+                path = get_file(filename)
+
+                with path.open("r", encoding="utf-8") as file:
+                    content = file.read()
+
+                st.success(f"Opened '{filename}' successfully.")
+
+                st.text_area(
+                    "File Content",
+                    value=content,
+                    height=250,
+                    disabled=True
+                )
+
+            except (OSError, UnicodeError, ValueError) as error:
+                st.error(f"Unable to read file: {error}")
+
+# --------------------------------------------------
+# UPDATE FILE
+# --------------------------------------------------
+
+elif operation == "✏️ Update File":
+
+    st.header("✏️ Update a File")
+
+    files = get_files()
+
+    if not files:
+
+        st.info("No files found. Please create a file first.")
+
+    else:
+
+        filename = st.selectbox(
+            "Select a file to update",
+            files,
+            key="update_filename"
+        )
+
+        update_type = st.radio(
+            "Choose an operation",
+            [
+                "Rename File",
+                "Append Content",
+                "Overwrite Content"
+            ],
+            horizontal=True
+        )
+
+        # RENAME FILE
+
+        if update_type == "Rename File":
+
+            new_name = st.text_input(
+                "New file name",
+                placeholder="new_notes.txt"
+            )
+
+            if st.button(
+                "✏️ Rename File",
+                use_container_width=True
+            ):
+
+                try:
+                    old_path = get_file(filename)
+
+                    if not new_name.strip():
+
+                        st.error("Please enter a new file name.")
+
+                    else:
+
+                        new_path = get_file(new_name)
+
+                        if new_path.exists():
+
+                            st.error(
+                                "A file with the new name already exists."
+                            )
+
+                        else:
+
+                            old_path.rename(new_path)
+
+                            st.success("File renamed successfully!")
+
+                            st.rerun()
+
+                except (OSError, ValueError) as error:
+                    st.error(f"Unable to rename file: {error}")
+
+        # APPEND CONTENT
+
+        elif update_type == "Append Content":
+
+            new_content = st.text
